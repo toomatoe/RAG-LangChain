@@ -1,5 +1,7 @@
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores import Chroma
+from langchain.embeddings import VertexAIEmbeddings
 import shutil
 import os
 
@@ -53,6 +55,33 @@ def save_to_chroma(chunks: list):
     #clear out database
     if os.path.exists(CHROMA_PATH):
         shutil.rmtree(CHROMA_PATH) 
+def get_vertexai_embeddings():
+    
+    model_name = os.getenv("GEMINI_EMBEDDING_MODEL")
+    try:
+        if model_name:
+            return VertexAIEmbeddings(model_name=model_name)
+        return VertexAIEmbeddings()
+    except Exception as e:
+        raise RuntimeError(
+            "Failed to initialize VertexAIEmbeddings. Ensure Google Vertex AI SDK is installed and configured. "
+            + str(e)
+        )
+
+
+def save_to_chroma(chunks: list):
+    # clear out database directory then create anew
+    if os.path.exists(CHROMA_PATH):
+        shutil.rmtree(CHROMA_PATH)
+    os.makedirs(CHROMA_PATH, exist_ok=True)
+        embeddings = get_vertexai_embeddings()
+    db = Chroma.from_documents(chunks, embeddings, persist_directory=CHROMA_PATH)
+    try:
+        db.persist()
+    except Exception:
+        # some Chroma versions call .persist() automatically or don't support it
+        pass
+    print(f"Saved {len(chunks)} chunks to Chroma at {CHROMA_PATH}")
 
 
 if __name__ == "__main__":
