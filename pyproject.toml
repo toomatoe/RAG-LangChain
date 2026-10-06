@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rag-langchain"
+version = "0.1.0"
+description = "Ask grounded questions about local documents with Gemini, LangChain, and Chroma"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "GPL-3.0-only"
+dependencies = [
+  "langchain-core>=1.0,<2",
+  "langchain-text-splitters>=1.0,<2",
+  "langchain-google-genai>=4.0,<5",
+  "langchain-chroma>=1.0,<2",
+  "pypdf>=6,<7",
+  "python-dotenv>=1,<2",
+  "streamlit>=1.40,<2",
+  "filelock>=3.16,<4",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.9,<1"]
+
+[project.scripts]
+rag = "rag_langchain.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

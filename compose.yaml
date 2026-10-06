@@ -1,0 +1,11 @@
+services:
+  rag:
+    build: .
+    ports:
+      - "127.0.0.1:8501:8501"
+    env_file: .env
+    volumes:
+      - ./data/books:/app/data/books:ro
+      - rag-index:/app/data/chroma_db
+volumes:
+  rag-index:
