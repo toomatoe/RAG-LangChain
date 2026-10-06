@@ -205,3 +205,10 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Local documents, index, and credentials
+.env.*
+!.env.example
+data/chroma_db/
+data/uploads/
+*.lock
