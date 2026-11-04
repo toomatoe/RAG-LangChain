@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="sweetalert2.all.min.js"></script>
+<style>
+body{margin:0;font:14px system-ui;color:#e7edf5;background:transparent}
+.swal2-popup{font-size:14px!important;border:1px solid #455268!important}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><p id="fallback">Loading confirmation…</p>
+<script>
+let opened = false;
+const send = (type, data = {}) => parent.postMessage({isStreamlitMessage:true,type,...data}, '*');
+addEventListener('message', async event => {
+  if(event.source !== parent || event.data.type !== 'streamlit:render' || opened) return;
+  opened = true;
+  const args = event.data.args;
+  send('streamlit:setFrameHeight', {height:430});
+  document.getElementById('fallback').hidden = true;
+  // Stay inside the isolated component; text options never interpret user HTML.
+  const result = await Swal.fire({titleText:args.title, text:args.message,
+    icon:'warning', showCancelButton:true, confirmButtonText:'Confirm',
+    cancelButtonText:'Cancel', focusCancel:true, returnFocus:true,
+    background:'#182234',color:'#e7edf5',confirmButtonColor:'#247f70',
+    cancelButtonColor:'#455268', heightAuto:false});
+  send('streamlit:setComponentValue', {value:{confirmed:result.isConfirmed},dataType:'json'});
+});
+send('streamlit:componentReady', {apiVersion:1});
+send('streamlit:setFrameHeight', {height:430});
+</script></body></html>

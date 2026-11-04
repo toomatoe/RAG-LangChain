@@ -16,7 +16,7 @@ dependencies = [
   "langchain-chroma>=1.0,<2",
   "pypdf>=6,<7",
   "python-dotenv>=1,<2",
-  "streamlit>=1.40,<2",
+  "streamlit>=1.50,<2",
   "filelock>=3.16,<4",
 ]
 
@@ -37,3 +37,6 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.setuptools.package-data]
+rag_langchain = ["popup_frontend/*"]

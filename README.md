@@ -2,7 +2,17 @@
 
 Ask questions about local PDFs, Markdown files, and text documents with **Gemini + LangChain + Chroma**. Answers include numbered citations, and the web interface shows the exact passages sent to the model.
 
+Choose **Single** for a quick answer or **Council** for three parallel evidence reviewers
+(an analyst, skeptic, and context reviewer), followed by a chair synthesis. Inspect each
+review, its status and duration, and the exact cited excerpts. The refreshed workspace also
+includes progress updates, JSON answer exports, and SweetAlert2 confirmations for rebuilding
+embeddings or clearing a conversation.
+
 The original document-loading experiment is now an installable application with a CLI, Streamlit interface, incremental indexing, automated tests, and Docker support. The included *Alice in Wonderland* text is a ready-to-index example.
+
+![Document workspace](docs/workspace.png)
+
+*UI preview uses an offline document fixture.*
 
 ## Quick start
 
@@ -53,6 +63,7 @@ Open the local URL printed by Streamlit, usually `http://localhost:8501`. Choose
 | `rag status` | Show indexed files, chunk count, source root, and embedding settings |
 | `rag search "question" --top-k 3` | Inspect retrieved excerpts without calling the chat model |
 | `rag ask "question" --top-k 5` | Generate an answer with numbered source citations |
+| `rag ask "question" --mode council --json` | Run the evidence council and include reviewer records |
 | `rag ask "question" --json` | Return the question, answer, and source records as JSON |
 | `rag search "question" --json` | Return source excerpts, page numbers, IDs, and distances as JSON |
 
@@ -67,6 +78,26 @@ python -m rag_langchain status
 The original command still works: `python loadData.py`. Use `python queryData.py "your question"` for the companion query entry point.
 
 PDF pages use **one-based** page numbers. Markdown and text citations use file paths relative to the selected folder. Retrieval returns cosine distance, where lower values indicate closer vectors; it is not a calibrated confidence score.
+
+## Council mode
+
+```bash
+rag ask "Which claims are supported, and what evidence is missing?" --mode council --json
+```
+
+In the web app, select **Council** before asking. All three reviewers work from the same
+bounded source snapshot, then the chair checks their findings against those excerpts.
+At least two reviews must succeed. Failed reviews are shown explicitly; the system never
+silently changes modes. Numeric citations must refer to supplied sources, and uncited
+syntheses are withheld.
+
+Council uses up to four logical model calls instead of one, with provider retries in
+addition. Each call has a 2,048-token output ceiling and a 60-second timeout with two retries.
+It costs more and can take longer. Agreement is not a confidence score or proof of correctness;
+all roles currently use the same configured model. This is role-based orchestration, not a
+modification of neural attention. Citation checks validate IDs, not whether a claim is true.
+
+[Architecture, UI research, tradeoffs, and validation](docs/design-notes.md).
 
 ## Configuration
 

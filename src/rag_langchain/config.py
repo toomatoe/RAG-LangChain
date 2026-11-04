@@ -69,6 +69,7 @@ def make_chat(settings):
         google_api_key=api_key(),
         vertexai=False,
         temperature=0,
+        max_output_tokens=2048,
         max_retries=2,
         timeout=60,
     )
