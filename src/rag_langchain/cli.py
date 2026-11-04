@@ -23,6 +23,8 @@ def main(argv=None):
     for name in ("ask", "search"):
         command = commands.add_parser(name)
         command.add_argument("question")
+        if name == "ask":
+            command.add_argument("--mode", choices=["single", "council"], default="single")
         command.add_argument("--top-k", type=int)
         command.add_argument("--json", action="store_true", help="Machine-readable output")
     args = parser.parse_args(argv)
@@ -47,7 +49,7 @@ def main(argv=None):
                     print(f"[{source.number}] {source.source} (distance {source.distance:.4f})")
                     print(source.excerpt + "\n")
         else:
-            result = service.ask(args.question, args.top_k)
+            result = service.ask(args.question, args.top_k, mode=args.mode)
             if args.json:
                 print(json.dumps(result.to_dict(), indent=2))
             else:
